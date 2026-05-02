@@ -1,5 +1,6 @@
 package com.biblioteca.user_service.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
