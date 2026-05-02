@@ -1,5 +1,9 @@
 package com.biblioteca.user_service.exception;
 
-public class DuplicateEmailException {
+public class DuplicateEmailException extends RuntimeException {
+    
+    public DuplicateEmailException(String message){
+        super(message);
+    }
 
 }
