@@ -1,10 +1,10 @@
-package com.example.fine_service;
+package com.example.category_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class FineServiceApplicationTests {
+class CategoryServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
