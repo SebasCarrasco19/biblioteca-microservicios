@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.biblioteca.user_service.dto.MessageResponse;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -44,9 +46,16 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desactivarUsuario(@PathVariable Long id) {
+    public ResponseEntity<MessageResponse> desactivarUsuario(@PathVariable Long id) {
         service.desactivarUsuario(id);
-        return ResponseEntity.noContent().build();
+
+        MessageResponse response = MessageResponse.builder()
+                .message("Usuario desactivado correctamente con ID: " + id)
+                .status(HttpStatus.OK.value())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/activar")
