@@ -7,15 +7,15 @@ import lombok.Getter;
 @Getter
 @Builder
 public class BookResponse {
-
     private Long id;
     private String title;
     private String isbn;
     private String description;
     private String author;
-    private String category;
+    private String editorial;
+    private Long categoryId;
     private Integer publishedYear;
-    private Boolean active;
+    private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

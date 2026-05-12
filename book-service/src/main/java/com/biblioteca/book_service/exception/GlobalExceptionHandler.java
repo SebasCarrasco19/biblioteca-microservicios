@@ -14,47 +14,42 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BookNotFoundException.class)
-    public ResponseEntity<ApiError> handleNotFound(BookNotFoundException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
+    public ResponseEntity<ApiError> notFound(BookNotFoundException ex, HttpServletRequest req) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), req.getRequestURI());
     }
 
-    @ExceptionHandler(DuplicateIsbnException.class)
-    public ResponseEntity<ApiError> handleDuplicate(DuplicateIsbnException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
+    @ExceptionHandler({DuplicateIsbnException.class, BookStateException.class})
+    public ResponseEntity<ApiError> conflict(RuntimeException ex, HttpServletRequest req) {
+        return build(HttpStatus.CONFLICT, ex.getMessage(), req.getRequestURI());
     }
 
-    @ExceptionHandler(ForbiddenActionException.class)
-    public ResponseEntity<ApiError> handleForbidden(ForbiddenActionException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.FORBIDDEN, ex.getMessage(), request.getRequestURI());
+    @ExceptionHandler({ForbiddenActionException.class})
+    public ResponseEntity<ApiError> forbidden(RuntimeException ex, HttpServletRequest req) {
+        return build(HttpStatus.FORBIDDEN, ex.getMessage(), req.getRequestURI());
+    }
+
+    @ExceptionHandler({RemoteCategoryNotFoundException.class, RemoteCategoryStateException.class})
+    public ResponseEntity<ApiError> badRequest(RuntimeException ex, HttpServletRequest req) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage(), req.getRequestURI());
     }
 
     @ExceptionHandler(RemoteServiceException.class)
-    public ResponseEntity<ApiError> handleRemote(RemoteServiceException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request.getRequestURI());
+    public ResponseEntity<ApiError> remote(RemoteServiceException ex, HttpServletRequest req) {
+        return build(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), req.getRequestURI());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
-        String message = ex.getBindingResult().getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining("; "));
-
-        return buildError(HttpStatus.BAD_REQUEST, message, request.getRequestURI());
+    public ResponseEntity<ApiError> validation(MethodArgumentNotValidException ex, HttpServletRequest req) {
+        String msg = ex.getBindingResult().getFieldErrors().stream().map(FieldError::getDefaultMessage).collect(Collectors.joining("; "));
+        return build(HttpStatus.BAD_REQUEST, msg, req.getRequestURI());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleUnexpected(Exception ex, HttpServletRequest request) {
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", request.getRequestURI());
+    public ResponseEntity<ApiError> generic(Exception ex, HttpServletRequest req) {
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", req.getRequestURI());
     }
 
-    private ResponseEntity<ApiError> buildError(HttpStatus status, String message, String path) {
-        ApiError error = ApiError.builder()
-                .timestamp(LocalDateTime.now())
-                .status(status.value())
-                .error(status.getReasonPhrase())
-                .message(message)
-                .path(path)
-                .build();
-        return ResponseEntity.status(status).body(error);
+    private ResponseEntity<ApiError> build(HttpStatus s, String m, String p) {
+        return ResponseEntity.status(s).body(ApiError.builder().timestamp(LocalDateTime.now()).status(s.value()).error(s.getReasonPhrase()).message(m).path(p).build());
     }
 }

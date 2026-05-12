@@ -1,13 +1,6 @@
 ﻿package com.biblioteca.book_service.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,14 +27,18 @@ public class Book {
     @Column(nullable = false, length = 120)
     private String author;
 
-    @Column(nullable = false, length = 80)
-    private String category;
-
-    @Column(name = "published_year")
-    private Integer publishedYear;
+    @Column(nullable = false, length = 120)
+    private String editorial;
 
     @Column(nullable = false)
-    private Boolean active;
+    private Long categoryId;
+
+    @Column(name = "published_year", nullable = false)
+    private Integer publishedYear;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private BookStatus status;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -54,8 +51,8 @@ public class Book {
         LocalDateTime now = LocalDateTime.now();
         this.createdAt = now;
         this.updatedAt = now;
-        if (this.active == null) {
-            this.active = Boolean.TRUE;
+        if (this.status == null) {
+            this.status = BookStatus.ACTIVO;
         }
     }
 
