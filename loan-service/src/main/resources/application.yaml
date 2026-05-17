@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: loan-service
+
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_loans?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    username: root
+    password: ""
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+server:
+  port: 8088
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+feign:
+  client:
+    config:
+      user-service:
+        connectTimeout: 2000
+        readTimeout: 4000
+      copy-service:
+        connectTimeout: 2000
+        readTimeout: 4000
