@@ -4,67 +4,66 @@ spring:
 
   cloud:
     gateway:
-      mvc:
-        routes:
-          - id: auth-service
-            uri: lb://AUTH-SERVICE
-            predicates:
-              - Path=/api/auth/**
+      routes:
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/api/auth/**
 
-          - id: user-service
-            uri: lb://USER-SERVICE
-            predicates:
-              - Path=/api/users/**
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
 
-          - id: security-service-roles
-            uri: lb://SECURITY-SERVICE
-            predicates:
-              - Path=/api/roles/**
+        - id: security-service-roles
+          uri: lb://SECURITY-SERVICE
+          predicates:
+            - Path=/api/roles/**
 
-          - id: security-service-user-roles
-            uri: lb://SECURITY-SERVICE
-            predicates:
-              - Path=/api/user-roles/**
+        - id: security-service-user-roles
+          uri: lb://SECURITY-SERVICE
+          predicates:
+            - Path=/api/user-roles/**
 
-          - id: security-service-permissions
-            uri: lb://SECURITY-SERVICE
-            predicates:
-              - Path=/api/permissions/**
+        - id: security-service-permissions
+          uri: lb://SECURITY-SERVICE
+          predicates:
+            - Path=/api/permissions/**
 
-          - id: category-service
-            uri: lb://CATEGORY-SERVICE
-            predicates:
-              - Path=/api/categories/**
+        - id: category-service
+          uri: lb://CATEGORY-SERVICE
+          predicates:
+            - Path=/api/categories/**
 
-          - id: book-service
-            uri: lb://BOOK-SERVICE
-            predicates:
-              - Path=/api/books/**
+        - id: book-service
+          uri: lb://BOOK-SERVICE
+          predicates:
+            - Path=/api/books/**
 
-          - id: copy-service
-            uri: lb://COPY-SERVICE
-            predicates:
-              - Path=/api/copies/**
+        - id: copy-service
+          uri: lb://COPY-SERVICE
+          predicates:
+            - Path=/api/copies/**
 
-          - id: loan-service
-            uri: lb://LOAN-SERVICE
-            predicates:
-              - Path=/api/loans/**
+        - id: loan-service
+          uri: lb://LOAN-SERVICE
+          predicates:
+            - Path=/api/loans/**
 
-          - id: fine-service
-            uri: lb://FINE-SERVICE
-            predicates:
-              - Path=/api/fines/**
+        - id: fine-service
+          uri: lb://FINE-SERVICE
+          predicates:
+            - Path=/api/fines/**
 
-          - id: reservation-service
-            uri: lb://RESERVATION-SERVICE
-            predicates:
-              - Path=/api/reservations/**
+        - id: reservation-service
+          uri: lb://RESERVATION-SERVICE
+          predicates:
+            - Path=/api/reservations/**
 
-          - id: notification-service
-            uri: lb://NOTIFICATION-SERVICE
-            predicates:
-              - Path=/api/notifications/**
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notifications/**
 
 server:
   port: 8080

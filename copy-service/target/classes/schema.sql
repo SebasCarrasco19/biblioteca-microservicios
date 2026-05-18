@@ -1,9 +1,0 @@
-CREATE TABLE IF NOT EXISTS copies (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  book_id BIGINT NOT NULL,
-  inventory_code VARCHAR(60) NOT NULL UNIQUE,
-  location VARCHAR(120) NOT NULL,
-  status VARCHAR(30) NOT NULL,
-  estado VARCHAR(20) NOT NULL,
-  fecha_registro DATETIME NOT NULL
-);

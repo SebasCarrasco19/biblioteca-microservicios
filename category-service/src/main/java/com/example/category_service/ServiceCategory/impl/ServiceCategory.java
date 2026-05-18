@@ -20,29 +20,38 @@ public class ServiceCategory implements ICategoryService {
 
     @Override
     public List<ModelCategory> findAll() {
-        log.info("Obteniendo todas las categorias");
+        log.info("Obteniendo todas las categorías");
         return repositoryCategory.findAll();
     }
 
     @Override
     public ModelCategory findById(Long id) {
-        log.info("Buscando categoria con ID: {}", id);
+        log.info("Buscando categoría con ID: {}", id);
 
         return repositoryCategory.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro la categoria con ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No existe una categoría con ID: " + id
+                ));
     }
 
     @Override
     public ModelCategory save(DtoCategory dtoCategory) {
-        log.info("Guardando nueva categoria: {}", dtoCategory.getNombre());
+        log.info("Guardando nueva categoría: {}", dtoCategory.getNombre());
 
-        if (repositoryCategory.existsByNombre(dtoCategory.getNombre())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe una categoria con el nombre: " + dtoCategory.getNombre());
+        String nombre = dtoCategory.getNombre().trim();
+        String descripcion = dtoCategory.getDescripcion().trim();
+
+        if (repositoryCategory.existsByNombreIgnoreCase(nombre)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Ya existe una categoría con el nombre: " + nombre
+            );
         }
 
         ModelCategory category = ModelCategory.builder()
-                .nombre(dtoCategory.getNombre())
-                .descripcion(dtoCategory.getDescripcion())
+                .nombre(nombre)
+                .descripcion(descripcion)
                 .estado("ACTIVO")
                 .build();
 
@@ -51,28 +60,37 @@ public class ServiceCategory implements ICategoryService {
 
     @Override
     public ModelCategory update(Long id, DtoCategory dtoCategory) {
-        log.info("Actualizando categoria con ID: {}", id);
+        log.info("Actualizando categoría con ID: {}", id);
 
         ModelCategory category = findById(id);
 
-        if (repositoryCategory.existsByNombreAndIdNot(dtoCategory.getNombre(), id)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe otra categoria con el nombre: " + dtoCategory.getNombre());
+        String nombre = dtoCategory.getNombre().trim();
+        String descripcion = dtoCategory.getDescripcion().trim();
+
+        if (repositoryCategory.existsByNombreIgnoreCaseAndIdNot(nombre, id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Ya existe otra categoría con el nombre: " + nombre
+            );
         }
 
-        category.setNombre(dtoCategory.getNombre());
-        category.setDescripcion(dtoCategory.getDescripcion());
+        category.setNombre(nombre);
+        category.setDescripcion(descripcion);
 
         return repositoryCategory.save(category);
     }
 
     @Override
     public void delete(Long id) {
-        log.info("Desactivando categoria con ID: {}", id);
+        log.info("Desactivando categoría con ID: {}", id);
 
         ModelCategory category = findById(id);
 
         if ("INACTIVO".equalsIgnoreCase(category.getEstado())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "La categoria ya esta inactiva");
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "La categoría ya está inactiva"
+            );
         }
 
         category.setEstado("INACTIVO");
@@ -82,12 +100,15 @@ public class ServiceCategory implements ICategoryService {
 
     @Override
     public ModelCategory activate(Long id) {
-        log.info("Activando categoria con ID: {}", id);
+        log.info("Activando categoría con ID: {}", id);
 
         ModelCategory category = findById(id);
 
         if ("ACTIVO".equalsIgnoreCase(category.getEstado())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "La categoria ya esta activa");
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "La categoría ya está activa"
+            );
         }
 
         category.setEstado("ACTIVO");
