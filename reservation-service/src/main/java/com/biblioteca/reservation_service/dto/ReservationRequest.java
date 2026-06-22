@@ -1,4 +1,4 @@
-﻿package com.biblioteca.reservation_service.dto;
+package com.biblioteca.reservation_service.dto;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;

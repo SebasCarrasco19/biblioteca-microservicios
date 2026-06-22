@@ -1,4 +1,4 @@
-﻿package com.biblioteca.copy_service.dto;
+package com.biblioteca.copy_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

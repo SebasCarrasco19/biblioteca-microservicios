@@ -1,4 +1,4 @@
-﻿package com.biblioteca.reservation_service.exception;
+package com.biblioteca.reservation_service.exception;
 
 public class RemoteServiceException extends RuntimeException {
     public RemoteServiceException(String message) { super(message); }

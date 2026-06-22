@@ -1,4 +1,4 @@
-﻿package com.biblioteca.copy_service.dto;
+package com.biblioteca.copy_service.dto;
 
 import java.time.LocalDateTime;
 import lombok.Builder;

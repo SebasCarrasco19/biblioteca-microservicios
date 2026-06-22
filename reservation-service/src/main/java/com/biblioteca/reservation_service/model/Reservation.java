@@ -1,4 +1,4 @@
-﻿package com.biblioteca.reservation_service.model;
+package com.biblioteca.reservation_service.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

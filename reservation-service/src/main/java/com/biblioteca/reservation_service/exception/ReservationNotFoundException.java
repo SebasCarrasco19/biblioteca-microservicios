@@ -1,4 +1,4 @@
-﻿package com.biblioteca.reservation_service.exception;
+package com.biblioteca.reservation_service.exception;
 
 public class ReservationNotFoundException extends RuntimeException {
     public ReservationNotFoundException(Long id) {

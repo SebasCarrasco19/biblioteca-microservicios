@@ -1,3 +1,51 @@
+# Biblioteca Microservicios — Maven Multi-Módulo
+
+Este repositorio ahora se administra desde un único proyecto padre Maven. La lógica, los endpoints, las bases de datos y la comunicación entre microservicios se mantienen.
+
+## Abrir y compilar
+
+Abra **solamente esta carpeta raíz** en VSCode. Verifique Java y Maven:
+
+```bash
+java -version
+mvn -version
+```
+
+Primera compilación recomendada:
+
+```bash
+mvn clean install -DskipTests
+```
+
+Alternativa con Maven Wrapper en Windows:
+
+```powershell
+.\mvnw.cmd clean install -DskipTests
+```
+
+## Swagger/OpenAPI
+
+Los diez microservicios de negocio incluyen Swagger UI. Con el servicio iniciado, utilice:
+
+- `http://localhost:<puerto>/swagger-ui.html`
+- `http://localhost:<puerto>/v3/api-docs`
+
+La documentación adicional se encuentra en `docs/`.
+
+## Pruebas automáticas — Etapa 4
+
+Se incorporaron pruebas con JUnit 5, Mockito, MockMvc, Spring Boot Test y H2. Los diez microservicios de negocio incluyen pruebas de servicio, controlador y repositorio.
+
+Después de validar la estructura con `-DskipTests`, la construcción completa debe ejecutarse con:
+
+```powershell
+.\mvnw.cmd clean install
+```
+
+Las pruebas usan H2 en memoria y desactivan Eureka durante el entorno de test, por lo que no necesitan MySQL ni los otros microservicios para ejecutarse. Los documentos originales de las cuatro etapas están en `docs/documentación/etapas/`, y el detalle técnico se encuentra en `docs/documentación/pruebas-unitarias.md`.
+
+---
+
 # Sistema de Biblioteca con Arquitectura de Microservicios
 
 ## 1. Presentación general

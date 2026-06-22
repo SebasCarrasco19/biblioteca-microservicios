@@ -1,4 +1,4 @@
-﻿package com.biblioteca.reservation_service.exception;
+package com.biblioteca.reservation_service.exception;
 
 public class CopyNotAvailableException extends RuntimeException {
     public CopyNotAvailableException(Long id) {
