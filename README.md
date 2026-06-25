@@ -23,14 +23,21 @@ Alternativa con Maven Wrapper en Windows:
 .\mvnw.cmd clean install -DskipTests
 ```
 
-## Swagger/OpenAPI
+## Swagger/OpenAPI documentado
 
-Los diez microservicios de negocio incluyen Swagger UI. Con el servicio iniciado, utilice:
+Los microservicios de negocio incluyen Swagger UI y documentación OpenAPI descriptiva en sus controladores:
 
-- `http://localhost:<puerto>/swagger-ui.html`
+- `@Tag` agrupa los endpoints por área funcional.
+- `@Operation` muestra el resumen y la descripción de cada operación.
+- `@ApiResponse` documenta los códigos HTTP esperados.
+- `@Parameter` explica identificadores y encabezados requeridos.
+
+Con cada servicio iniciado, utilice:
+
+- `http://localhost:<puerto>/swagger-ui/index.html`
 - `http://localhost:<puerto>/v3/api-docs`
 
-La documentación adicional se encuentra en `docs/`.
+Se documentaron los 11 controladores y sus 73 endpoints sin modificar rutas ni lógica de negocio. El detalle y los enlaces por puerto se encuentran en [`docs/swagger-openapi.md`](docs/swagger-openapi.md).
 
 ## Pruebas automáticas — Etapa 4
 
