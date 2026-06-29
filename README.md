@@ -1,451 +1,424 @@
 # Biblioteca Microservicios — Maven Multi-Módulo
 
-Este repositorio ahora se administra desde un único proyecto padre Maven. La lógica, los endpoints, las bases de datos y la comunicación entre microservicios se mantienen.
+Sistema de biblioteca desarrollado con **Java 21, Spring Boot, Spring Cloud, Maven Multi-Módulo, MySQL, Eureka Server, API Gateway y Docker Compose** para la asignatura **Desarrollo FullStack I**.
 
-## Abrir y compilar
+## 🚀 Enlaces de entrega
 
-Abra **solamente esta carpeta raíz** en VSCode. Verifique Java y Maven:
+| Entrega | Contenido | Enlace |
+|---|---|---|
+| **📦 Versión nativa**<br>JAR + BAT | Archivo `.zip` con la carpeta `apps/`, los 12 archivos `.jar`, `arrancar-nativo.bat`, `detener-nativo.bat` y la documentación de ejecución. | [Descargar versión nativa](https://drive.google.com/file/d/1bULOkHL3EOhEFXhALF8dU7pzyS027YcE/view?usp=sharing) |
+| **🐳 Versión Docker** | Archivo `.zip` con los 12 archivos `.jar`, `docker-compose.yml`, variables de entorno, scripts de administración y documentación de despliegue. | [Descargar versión Docker](https://drive.google.com/file/d/1WIdNUZzJBcoLepibYpvanQ0tfjRMYiM_/view?usp=sharing) |
+| **🎥 Video de defensa técnica** | Evidencia del funcionamiento del sistema, las pruebas unitarias y el aporte técnico de cada integrante. Duración ideal: **15 minutos**. Duración máxima: **18 minutos**. | [Ver video de defensa](https://drive.google.com/drive/folders/1zjMHkm9baMPnMFc-ASUDExCJuqw5yWFJ) |
 
-```bash
-java -version
-mvn -version
+> La entrega incluye el archivo `subtitulos-video.txt` con el contenido hablado durante la defensa técnica.
+
+---
+
+## 1. Descripción general
+
+El sistema permite gestionar:
+
+- usuarios;
+- credenciales e inicio de sesión;
+- roles y asignaciones de roles;
+- categorías;
+- libros;
+- copias físicas;
+- préstamos;
+- reservas;
+- multas;
+- notificaciones.
+
+La solución separa cada responsabilidad en un microservicio independiente. Los servicios se descubren mediante **Eureka**, se consumen a través de **API Gateway** y se comunican mediante **REST y OpenFeign**.
+
+## 2. Arquitectura
+
+| Componente | Responsabilidad | Puerto |
+|---|---|---:|
+| `eureka-server` | Descubrimiento y registro de servicios | 8761 |
+| `api-gateway` | Punto único de entrada y enrutamiento | 8080 |
+| `user-service` | Gestión de usuarios | 8082 |
+| `security-service` | Roles y asignación de roles | 8083 |
+| `auth-service` | Registro de credenciales, login y JWT | 8084 |
+| `category-service` | Gestión de categorías | 8085 |
+| `book-service` | Gestión de libros | 8086 |
+| `copy-service` | Gestión de ejemplares físicos | 8087 |
+| `loan-service` | Gestión de préstamos | 8088 |
+| `reservation-service` | Gestión de reservas | 8089 |
+| `fine-service` | Gestión de multas | 8090 |
+| `notification-service` | Gestión de notificaciones | 8091 |
+
+### Orden jerárquico de arranque
+
+```text
+1. MySQL
+2. Eureka Server
+3. Microservicios de negocio
+4. API Gateway
 ```
 
-Primera compilación recomendada:
+Eureka debe estar disponible antes de los microservicios, y API Gateway debe iniciarse al final para enrutar hacia servicios ya registrados.
 
-```bash
-mvn clean install -DskipTests
+## 3. Tecnologías utilizadas
+
+- Java 21
+- Spring Boot
+- Spring Cloud Eureka
+- Spring Cloud Gateway WebFlux
+- Spring Cloud OpenFeign
+- Spring Data JPA
+- Bean Validation
+- MySQL 8
+- Maven Multi-Módulo
+- JUnit 5
+- Mockito
+- MockMvc
+- H2
+- JaCoCo
+- Swagger / OpenAPI
+- Docker Desktop y Docker Compose
+- Git y GitHub
+
+---
+
+## Puesta en marcha
+
+## 4. Versión nativa — JAR + BAT
+
+### Contenido del paquete
+
+```text
+biblioteca-deploy-nativo/
+├── apps/                         # 12 archivos JAR
+├── logs/
+├── arrancar-nativo.bat
+├── detener-nativo.bat
+└── README-EJECUCION-NATIVA.md
 ```
 
-Alternativa con Maven Wrapper en Windows:
+### Requisitos
+
+- Windows 10 u 11
+- Java 21
+- MySQL disponible en `localhost:3307`
+- Usuario local configurado: `root`
+- Contraseña local configurada: vacía
+
+### Ejecución
+
+1. Descargar y extraer `biblioteca-deploy-nativo.zip`.
+2. Iniciar MySQL en XAMPP usando el puerto `3307`.
+3. Ejecutar con doble clic:
+
+```text
+arrancar-nativo.bat
+```
+
+El script valida Java, MySQL y los 12 JAR, y ejecuta automáticamente:
+
+```text
+1. eureka-server
+2. user-service
+3. security-service
+4. auth-service
+5. category-service
+6. book-service
+7. copy-service
+8. loan-service
+9. reservation-service
+10. fine-service
+11. notification-service
+12. api-gateway
+```
+
+El orden lógico aplicado por el script es:
+
+```text
+Eureka Server → Microservicios → API Gateway
+```
+
+### Verificación
+
+- Eureka: `http://localhost:8761`
+- Gateway: `http://localhost:8080/api/categories`
+- Swagger User: `http://localhost:8082/swagger-ui/index.html`
+
+En Eureka deben aparecer los diez microservicios y API Gateway con estado `UP`.
+
+### Detención
+
+Ejecutar:
+
+```text
+detener-nativo.bat
+```
+
+---
+
+## 5. Versión Docker
+
+### Contenido del paquete
+
+```text
+biblioteca-deploy-docker/
+├── apps/                         # 12 archivos JAR
+├── backups/
+├── config/
+├── docs/
+│   └── init.sql
+├── .env
+├── docker-compose.yml
+├── arrancar-docker.bat
+├── detener-docker.bat
+├── ver-logs.bat
+├── backup-db.bat
+├── restaurar-db.bat
+└── README-DESPLIEGUE-DOCKER.md
+```
+
+### Requisitos
+
+- Docker Desktop
+- Docker Engine en estado `running`
+- WSL 2 habilitado en Windows
+- Puerto `3307` disponible
+
+> [!WARNING]
+> Para ejecutar la versión Docker, detenga MySQL de XAMPP si está utilizando el puerto `3307`.
+
+### Ejecución
+
+1. Descargar y extraer `biblioteca-deploy-docker.zip`.
+2. Abrir Docker Desktop y esperar a que Docker Engine esté funcionando.
+3. Ejecutar:
+
+```text
+arrancar-docker.bat
+```
+
+El despliegue levanta 13 contenedores:
+
+- 1 contenedor MySQL;
+- 1 Eureka Server;
+- 10 microservicios de negocio;
+- 1 API Gateway.
+
+### Verificación
+
+Desde PowerShell, dentro de la carpeta Docker:
 
 ```powershell
-.\mvnw.cmd clean install -DskipTests
+docker compose ps
 ```
 
-## Swagger/OpenAPI documentado
+MySQL debe aparecer como `healthy` y los demás contenedores como `Up`.
 
-Los microservicios de negocio incluyen Swagger UI y documentación OpenAPI descriptiva en sus controladores:
+Enlaces principales:
 
-- `@Tag` agrupa los endpoints por área funcional.
-- `@Operation` muestra el resumen y la descripción de cada operación.
-- `@ApiResponse` documenta los códigos HTTP esperados.
-- `@Parameter` explica identificadores y encabezados requeridos.
+- Eureka: `http://localhost:8761`
+- Gateway: `http://localhost:8080/api/categories`
+- Swagger User: `http://localhost:8082/swagger-ui/index.html`
 
-Con cada servicio iniciado, utilice:
+### Detención
 
-- `http://localhost:<puerto>/swagger-ui/index.html`
-- `http://localhost:<puerto>/v3/api-docs`
+Ejecutar:
 
-Se documentaron los 11 controladores y sus 73 endpoints sin modificar rutas ni lógica de negocio. El detalle y los enlaces por puerto se encuentran en [`docs/swagger-openapi.md`](docs/swagger-openapi.md).
+```text
+detener-docker.bat
+```
 
-## Pruebas automáticas — Etapa 4
+El comando conserva el volumen de MySQL. No utilizar `docker compose down -v` salvo que se quiera eliminar completamente la información persistida.
 
-Se incorporaron pruebas con JUnit 5, Mockito, MockMvc, Spring Boot Test y H2. Los diez microservicios de negocio incluyen pruebas de servicio, controlador y repositorio.
+---
 
-Después de validar la estructura con `-DskipTests`, la construcción completa debe ejecutarse con:
+## Calidad, pruebas y documentación
+
+## 6. Compilación del proyecto
+
+Abra únicamente la carpeta raíz del repositorio, donde se encuentra el `pom.xml` padre.
+
+Verificar Java y Maven:
+
+```powershell
+java -version
+.\mvnw.cmd -version
+```
+
+En Windows, el comando recomendado es:
 
 ```powershell
 .\mvnw.cmd clean install
 ```
 
-Las pruebas usan H2 en memoria y desactivan Eureka durante el entorno de test, por lo que no necesitan MySQL ni los otros microservicios para ejecutarse. Los documentos originales de las cuatro etapas están en `docs/documentación/etapas/`, y el detalle técnico se encuentra en `docs/documentación/pruebas-unitarias.md`.
+También puede validarse la fase de pruebas y cobertura con:
+
+```powershell
+.\mvnw.cmd clean verify
+```
+
+El resultado esperado es:
+
+```text
+BUILD SUCCESS
+```
+
+> [!NOTE]
+> `-DskipTests` solo debe utilizarse para una compilación rápida de diagnóstico. La validación final debe ejecutarse sin omitir las pruebas.
+
+## 7. Pruebas unitarias
+
+El proyecto incluye pruebas con:
+
+- JUnit 5;
+- Mockito;
+- MockMvc;
+- Spring Boot Test;
+- H2 en memoria;
+- JaCoCo para medir cobertura.
+
+Se prueban principalmente:
+
+- lógica de negocio de los Service;
+- respuestas y códigos HTTP de los Controller;
+- consultas de Repository;
+- excepciones;
+- validaciones;
+- clientes Feign simulados;
+- casos positivos y negativos.
+
+La suite completa puede ejecutarse con:
+
+```powershell
+.\mvnw.cmd clean install
+```
+
+También puede validarse con:
+
+```powershell
+.\mvnw.cmd clean verify
+```
+
+La construcción validada debe terminar sin fallos, errores ni pruebas omitidas. Los reportes JaCoCo se generan por módulo en:
+
+```text
+<servicio>/target/site/jacoco/index.html
+```
+
+## 8. Swagger / OpenAPI
+
+Los controladores están documentados mediante anotaciones OpenAPI, incluyendo descripciones, parámetros y respuestas HTTP.
+
+### Swagger UI por microservicio
+
+| Servicio | Swagger UI |
+|---|---|
+| User | `http://localhost:8082/swagger-ui/index.html` |
+| Security | `http://localhost:8083/swagger-ui/index.html` |
+| Auth | `http://localhost:8084/swagger-ui/index.html` |
+| Category | `http://localhost:8085/swagger-ui/index.html` |
+| Book | `http://localhost:8086/swagger-ui/index.html` |
+| Copy | `http://localhost:8087/swagger-ui/index.html` |
+| Loan | `http://localhost:8088/swagger-ui/index.html` |
+| Reservation | `http://localhost:8089/swagger-ui/index.html` |
+| Fine | `http://localhost:8090/swagger-ui/index.html` |
+| Notification | `http://localhost:8091/swagger-ui/index.html` |
+
+El documento OpenAPI en formato JSON se encuentra en:
+
+```text
+http://localhost:<puerto>/v3/api-docs
+```
 
 ---
 
-# Sistema de Biblioteca con Arquitectura de Microservicios
+## Configuración y funcionamiento
 
-## 1. Presentación general
+## 9. Bases de datos
 
-Este proyecto corresponde a un sistema de biblioteca desarrollado con arquitectura de microservicios para la asignatura Desarrollo Fullstack I.
-
-El sistema permite gestionar usuarios, autenticación, roles, categorías, libros, copias físicas, préstamos, reservas, multas y notificaciones. La solución fue construida separando las responsabilidades principales en distintos microservicios, con el objetivo de evitar una aplicación monolítica y permitir que cada funcionalidad pueda ser desarrollada, ejecutada y probada de forma independiente.
-
-## 2. Objetivo del sistema
-
-El objetivo principal del sistema es administrar los procesos básicos de una biblioteca mediante servicios independientes que se comunican entre sí.
-
-El sistema permite:
-
-- Registrar y administrar usuarios.
-- Registrar credenciales e iniciar sesión.
-- Crear y asignar roles a usuarios.
-- Registrar categorías de libros.
-- Registrar libros asociados a categorías.
-- Registrar copias físicas asociadas a libros.
-- Crear préstamos de copias disponibles.
-- Crear reservas de copias.
-- Registrar multas asociadas a préstamos.
-- Registrar notificaciones para usuarios.
-
-## 3. Problema que resuelve
-
-En una biblioteca existen distintas áreas de gestión: usuarios, libros, copias, préstamos, reservas, multas y notificaciones. Si todo esto se desarrolla en una sola aplicación, el sistema se vuelve más difícil de mantener, probar y escalar.
-
-Este proyecto resuelve ese problema dividiendo la lógica en microservicios independientes. Cada servicio tiene una responsabilidad específica y se comunica con otros servicios cuando necesita validar información o ejecutar acciones relacionadas.
-
-## 4. Arquitectura del sistema
-
-El sistema está compuesto por los siguientes componentes:
-
-| Componente | Responsabilidad |
-|---|---|
-| eureka-server | Servidor de descubrimiento de servicios. Permite registrar y visualizar los microservicios activos. |
-| api-gateway | Punto único de entrada al sistema. Redirige las solicitudes hacia cada microservicio. |
-| user-service | Gestión de usuarios. |
-| auth-service | Registro de credenciales e inicio de sesión. |
-| security-service | Gestión de roles y asignación de roles a usuarios. |
-| category-service | Gestión de categorías de libros. |
-| book-service | Gestión de libros. Valida categorías y permisos. |
-| copy-service | Gestión de copias físicas o ejemplares. Valida libros existentes. |
-| loan-service | Gestión de préstamos. Valida usuarios y copias. |
-| reservation-service | Gestión de reservas. Valida usuarios y copias. |
-| fine-service | Gestión de multas asociadas a préstamos. |
-| notification-service | Gestión de notificaciones para usuarios. |
-
-## 5. Comunicación entre microservicios
-
-Los microservicios se comunican principalmente mediante OpenFeign, utilizando los nombres registrados en Eureka.
-
-Ejemplos de comunicación:
-
-- auth-service consulta a user-service para validar que un usuario exista antes de registrar credenciales.
-- security-service administra roles y asignaciones de roles asociados a usuarios.
-- book-service consulta a category-service para validar que una categoría exista antes de crear un libro.
-- copy-service consulta a book-service para validar que un libro exista antes de crear una copia.
-- loan-service consulta a user-service y copy-service antes de crear un préstamo.
-- reservation-service consulta a user-service y copy-service antes de crear una reserva.
-- fine-service valida usuario y préstamo antes de registrar una multa.
-- notification-service permite registrar avisos asociados a usuarios.
-
-## 6. API Gateway
-
-El sistema utiliza api-gateway como punto único de entrada.
-
-En vez de consumir directamente cada microservicio por su puerto interno, las pruebas se realizan mediante:
-
-http://localhost:8080
-
-Ejemplos:
-
-GET http://localhost:8080/api/users
-GET http://localhost:8080/api/books
-GET http://localhost:8080/api/loans
-
-El Gateway redirige internamente la solicitud hacia el microservicio correspondiente usando Eureka.
-
-## 7. Eureka Server
-
-Eureka Server permite visualizar los servicios registrados y comprobar que se encuentran activos.
-
-URL de Eureka:
-
-http://localhost:8761
-
-En Eureka deben aparecer los microservicios en estado UP.
-
-## 8. Tecnologías utilizadas
-
-- Java 21
-- Spring Boot 3.5.14
-- Spring Cloud 2025.0.2
-- Spring Web
-- Spring Data JPA
-- Spring Validation
-- Spring Cloud OpenFeign
-- Spring Cloud Eureka
-- Spring Cloud Gateway WebFlux / Netty
-- MySQL
-- XAMPP
-- Maven
-- Postman
-- Git y GitHub
-- VS Code
-
-## 9. Puertos utilizados
-
-| Servicio | Puerto |
-|---|---|
-| Eureka Server | 8761 |
-| API Gateway | 8080 |
-| User Service | 8082 |
-| Security Service | 8083 |
-| Auth Service | 8084 |
-| Category Service | 8085 |
-| Book Service | 8086 |
-| Copy Service | 8087 |
-| Loan Service | 8088 |
-| Reservation Service | 8089 |
-| Fine Service | 8090 |
-| Notification Service | 8091 |
-
-## 10. Bases de datos
-
-Cada microservicio utiliza su propia base de datos en MySQL.
-
-Ejemplo de bases utilizadas:
+Cada microservicio de negocio utiliza una base independiente:
 
 | Microservicio | Base de datos |
 |---|---|
-| user-service | db_users |
-| auth-service | db_auth |
-| security-service | db_security |
-| category-service | db_categories |
-| book-service | db_books |
-| copy-service | db_copies |
-| loan-service | db_loans |
-| reservation-service | db_reservations |
-| fine-service | db_fines |
-| notification-service | db_notifications |
+| `user-service` | `db_users` |
+| `security-service` | `db_security` |
+| `auth-service` | `db_auth` |
+| `category-service` | `db_categories` |
+| `book-service` | `db_books` |
+| `copy-service` | `db_copies` |
+| `loan-service` | `db_loans` |
+| `reservation-service` | `db_reservations` |
+| `fine-service` | `db_fines` |
+| `notification-service` | `db_notifications` |
 
-Las bases se crean automáticamente mediante la configuración:
+### Entorno nativo
 
-createDatabaseIfNotExist=true
+```text
+MySQL: localhost:3307
+Eureka: localhost:8761
+```
 
-## 11. Requisitos previos
+### Entorno Docker
 
-Antes de ejecutar el proyecto se debe tener instalado:
+```text
+MySQL interno: mysql-db:3306
+Eureka interno: eureka-server:8761
+MySQL expuesto al host: 3307
+```
 
-- Java 21
-- Maven
-- XAMPP
-- MySQL activo en XAMPP
-- Postman
-- Git
-- VS Code o IDE compatible
+Dentro de Docker no se utiliza `localhost` para la comunicación entre contenedores.
 
-Importante:
+## 10. Comunicación entre microservicios
 
-En XAMPP solo es necesario iniciar MySQL.
-No es necesario iniciar Tomcat desde XAMPP.
+Ejemplos principales:
 
-## 12. Orden recomendado de ejecución
+- `auth-service` consulta a `user-service`;
+- `book-service` consulta a `category-service` y `security-service`;
+- `copy-service` consulta a `book-service`;
+- `loan-service` consulta a `user-service` y `copy-service`;
+- `reservation-service` consulta a `user-service` y `copy-service`;
+- `fine-service` valida usuarios y préstamos;
+- los servicios se descubren por nombre mediante Eureka.
 
-Para probar correctamente el proyecto, se recomienda levantar los servicios en este orden:
+## 11. API Gateway
 
-1. XAMPP / MySQL
-2. eureka-server
-3. user-service
-4. security-service
-5. auth-service
-6. category-service
-7. book-service
-8. copy-service
-9. loan-service
-10. reservation-service
-11. fine-service
-12. notification-service
-13. api-gateway
+API Gateway funciona en:
 
-Después de iniciar los servicios, revisar Eureka:
+```text
+http://localhost:8080
+```
 
-http://localhost:8761
+La raíz `/` no tiene una página web configurada y puede responder `404`. Se deben utilizar rutas reales, por ejemplo:
 
-Todos los servicios deben aparecer registrados y en estado UP.
+```text
+GET http://localhost:8080/api/users
+GET http://localhost:8080/api/categories
+GET http://localhost:8080/api/books
+GET http://localhost:8080/api/loans
+```
 
-## 13. Ejecución de un microservicio
+Una respuesta `200`, `401` o `403` confirma que la ruta está siendo atendida. Un `503` o `Connection refused` indica un problema de disponibilidad o enrutamiento.
 
-Para ejecutar un microservicio desde terminal:
+## 12. Validaciones y manejo de errores
 
-cd nombre-del-microservicio
-./mvnw spring-boot:run
+El sistema utiliza DTO, Bean Validation y excepciones centralizadas.
 
-En Windows:
+Respuestas habituales:
 
-cd nombre-del-microservicio
-.\mvnw.cmd spring-boot:run
+- `400 Bad Request`: campos inválidos;
+- `401 Unauthorized`: autenticación requerida;
+- `403 Forbidden`: permisos insuficientes;
+- `404 Not Found`: recurso inexistente;
+- `409 Conflict`: duplicado o transición inválida;
+- `503 Service Unavailable`: fallo de comunicación entre servicios.
 
-Para compilar un microservicio:
+---
 
-.\mvnw.cmd clean package -DskipTests
+## Equipo
 
-## 14. Endpoints principales
-
-### User Service
-
-POST   /api/users
-GET    /api/users
-GET    /api/users/{id}
-PUT    /api/users/{id}
-DELETE /api/users/{id}
-PATCH  /api/users/{id}/activar
-
-### Auth Service
-
-POST /api/auth/register
-POST /api/auth/login
-
-### Security Service
-
-POST   /api/roles
-GET    /api/roles
-GET    /api/roles/{id}
-PUT    /api/roles/{id}
-DELETE /api/roles/{id}
-PATCH  /api/roles/{id}/activar
-
-POST   /api/user-roles
-GET    /api/user-roles/user/{userId}
-GET    /api/user-roles/validate/{userId}/{roleName}
-DELETE /api/user-roles/{id}
-
-### Category Service
-
-POST   /api/categories
-GET    /api/categories
-GET    /api/categories/{id}
-PUT    /api/categories/{id}
-DELETE /api/categories/{id}
-PATCH  /api/categories/{id}/activate
-
-### Book Service
-
-POST   /api/books
-GET    /api/books
-GET    /api/books/{id}
-GET    /api/books/{id}/exists
-PUT    /api/books/{id}
-DELETE /api/books/{id}
-PATCH  /api/books/{id}/activate
-
-### Copy Service
-
-POST   /api/copies
-GET    /api/copies
-GET    /api/copies/{id}
-GET    /api/copies/{id}/available
-PUT    /api/copies/{id}
-DELETE /api/copies/{id}
-PATCH  /api/copies/{id}/activate
-PATCH  /api/copies/{id}/reserve
-PATCH  /api/copies/{id}/release
-PATCH  /api/copies/{id}/borrow
-PATCH  /api/copies/{id}/return
-
-### Loan Service
-
-POST  /api/loans
-GET   /api/loans
-GET   /api/loans/{id}
-GET   /api/loans/user/{userId}
-PATCH /api/loans/{id}/return
-PATCH /api/loans/{id}/cancel
-PATCH /api/loans/{id}/overdue
-
-### Reservation Service
-
-POST   /api/reservations
-GET    /api/reservations
-GET    /api/reservations/{id}
-GET    /api/reservations/user/{userId}
-DELETE /api/reservations/{id}
-PATCH  /api/reservations/{id}/activar
-PATCH  /api/reservations/{id}/expirar
-
-### Fine Service
-
-POST   /api/fines
-GET    /api/fines
-GET    /api/fines/{id}
-GET    /api/fines/user/{userId}
-GET    /api/fines/loan/{loanId}
-GET    /api/fines/pending
-PUT    /api/fines/{id}/pay
-DELETE /api/fines/{id}
-
-### Notification Service
-
-POST   /api/notifications
-GET    /api/notifications
-GET    /api/notifications/{id}
-GET    /api/notifications/user/{userId}
-PATCH  /api/notifications/{id}/send
-PATCH  /api/notifications/{id}/read
-DELETE /api/notifications/{id}
-
-## 15. Flujo funcional recomendado para pruebas en Postman
-
-El flujo recomendado de prueba es:
-
-1. Crear usuario.
-2. Crear rol ADMIN.
-3. Asignar rol ADMIN al usuario.
-4. Validar que el usuario tenga rol ADMIN.
-5. Crear categoría.
-6. Crear libro asociado a la categoría.
-7. Crear copia asociada al libro.
-8. Crear préstamo asociado a usuario y copia.
-9. Verificar que la copia cambie a PRESTADO.
-10. Devolver préstamo.
-11. Verificar que la copia vuelva a DISPONIBLE.
-12. Crear reserva.
-13. Crear multa.
-14. Crear notificación.
-
-## 16. Validaciones y manejo de errores
-
-El sistema implementa validaciones mediante DTOs y Bean Validation.
-
-Ejemplos de errores controlados:
-
-- 400 Bad Request: campos vacíos o formato inválido.
-- 404 Not Found: recurso inexistente.
-- 409 Conflict: duplicados o estados inválidos.
-- 403 Forbidden: usuario sin permisos suficientes.
-- 503 Service Unavailable: error de comunicación con otro microservicio.
-
-Ejemplos:
-
-- Crear usuario con email inválido devuelve 400.
-- Buscar una categoría inexistente devuelve 404.
-- Crear un libro con ISBN duplicado devuelve 409.
-- Crear un libro sin rol ADMIN o BIBLIOTECARIO devuelve 403.
-
-## 17. Evidencias del proyecto
-
-El repositorio incluye una carpeta para evidencias de entrega:
-
-entrega-video/
-
-En esa carpeta se puede subir el video de demostración técnica solicitado por la evaluación.
-
-## 18. Integrantes
-
-- Sebastian Carrasco
-- Daniel Perez
-- Simon Ojeda
-
-## 19. Distribución de responsabilidades
+## 13. Integrantes y responsabilidades
 
 | Integrante | Responsabilidades |
 |---|---|
-| Sebastian Carrasco | Eureka Server, API Gateway, user-service, auth-service y security-service. |
-| Daniel Perez | book-service, copy-service y reservation-service. |
-| Simon Ojeda | category-service, loan-service, fine-service y notification-service. |
-
-## 20. Estado actual del proyecto
-
-El proyecto cuenta con:
-
-- Arquitectura de microservicios.
-- Eureka Server funcionando.
-- API Gateway operativo.
-- Microservicios registrados en Eureka.
-- CRUD funcionales.
-- Comunicación entre servicios.
-- Validaciones con DTOs.
-- Manejo de errores.
-- Pruebas mediante Postman.
-- Bases de datos independientes por microservicio.
-
-## 21. Mejoras futuras
-
-Como mejoras futuras se podrían implementar:
-
-- Validación completa de JWT en API Gateway.
-- Mayor control de permisos por endpoint.
-- Documentación Swagger por microservicio.
-- Automatización de pruebas.
-- Integración más avanzada entre fine-service y notification-service.
-- Registro centralizado de logs.
-- Contenedores Docker para levantar el sistema completo con mayor facilidad.
+| Sebastián Carrasco | Eureka Server, API Gateway, `user-service`, `auth-service` y `security-service` |
+| Daniel Pérez | `book-service`, `copy-service` y `reservation-service` |
+| Simón Ojeda | `category-service`, `loan-service`, `fine-service` y `notification-service` |
